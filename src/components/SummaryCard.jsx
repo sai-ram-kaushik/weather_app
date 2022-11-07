@@ -18,3 +18,5 @@ function SummaryCard({day}) {
         </li>
     )
 }
+
+export default SummaryCard

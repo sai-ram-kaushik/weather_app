@@ -15,6 +15,46 @@ function App() {
     `${process.env.REACT_APP_ICON_URL}10n@2x.png`
   );
 
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    getWeather(searchTerm)
+  }
+  
+  const handleChange = (input) => {
+    const {value} = input.target
+    setSearchTerm(value)
+  }
+
+  const getWeather = async (location) =>{
+    setWeatherData([])
+
+    let how_to_search = (typeof location === 'string') ? `q=${location}` : `lat=${location[0]}&lon=${location[1]}`
+
+    try{
+      let res = await fetch(`${process.env.REACT_APP_URL+how_to_search}&appid=${API_KEY}&units=metric&cnt=5&exclude=hourly,minutely`)
+
+      let data = await res.json()
+
+      if(data.cod != 200){
+        setNoData('Location Not Found')
+        return
+      }
+
+      setWeatherData(data)
+      setCity(`${data.city.name}, ${data.city.country}`)
+
+      setWeatherIcon(`${process.env.REACT_APP_ICON_URL + data.list[0].weather[0]["icon"]}@4x.png`)
+
+    }catch(error){
+      console.log("Error Encoutered" + error)
+    }
+  }
+
+  const myIP = (location) => {
+    const {latitude, longitude} = location.coords
+    getWeather([latitude, longitude])
+  }
+
   return (
     <div className="bg-gray-800 flex items-center justify-center w-screen h-screen py-10">
       <div className="flex w-3/4 min-h-full rounded-xl shadow-lg m-auto bg-gray-100">
@@ -32,7 +72,7 @@ function App() {
             </div>
           </div>
           <div className="flex flex-col items-center justify-center h-full">
-            <h1 className="text-white text-2xl">
+            <h1 className="text-pink-800 text-2xl">
               The Only weather Forecast App You Need
             </h1>
             <hr className="h-1 bg-white w-1/4 rounded-full my-5" />
@@ -43,7 +83,7 @@ function App() {
             >
               <input
                 type="text"
-                className="relative rounded-xl py-2 px-3 bg-gray-300 bg-opacity-60 text-white placeholder-gray-200"
+                className="relative rounded-xl py-2 px-3 bg-black bg-opacity-60 text-white placeholder-gray-200"
                 onChange={handleChange}
                 required
               />
